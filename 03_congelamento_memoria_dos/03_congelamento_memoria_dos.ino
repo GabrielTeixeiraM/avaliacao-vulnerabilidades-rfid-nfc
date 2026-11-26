@@ -27,6 +27,15 @@ bool compare4Bytes(uint8_t *firstBytes, uint8_t *secondBytes) {
   return true;
 }
 
+void signalAccessDenied(void) {
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(GREEN_LED, HIGH);
+    delay(100);
+    digitalWrite(GREEN_LED, LOW);
+    delay(100);
+  }
+}
+
 void setup(void) {
   Serial.begin(115200);
 
@@ -75,6 +84,7 @@ void loop(void) {
 
   if (!success) {
     Serial.println("[ERRO] Falha na leitura da página 4.");
+    signalAccessDenied();
     Serial.println("====================================");
     delay(1500);
     return;
@@ -89,6 +99,7 @@ void loop(void) {
 
   if (!compare4Bytes(pageData, (uint8_t *)VALID_PAYLOAD)) {
     Serial.println("[NEGADO] Conteúdo inválido na página 4.");
+    signalAccessDenied();
     Serial.println("====================================");
     delay(1500);
     return;
@@ -103,6 +114,7 @@ void loop(void) {
   if (!success) {
     Serial.println("[ERRO] Falha na leitura do contador da página 5.");
     Serial.println("[NEGADO] Acesso negado.");
+    signalAccessDenied();
     Serial.println("====================================");
     delay(2000);
     return;
@@ -119,6 +131,7 @@ void loop(void) {
   if (!success) {
     Serial.println("[ERRO] Escrita Bloqueada: falha na escrita da página 5.");
     Serial.println("[NEGADO] Acesso negado.");
+    signalAccessDenied();
     Serial.println("====================================");
     delay(2000);
     return;
@@ -130,6 +143,7 @@ void loop(void) {
   if (!success) {
     Serial.println("[ERRO] Falha na leitura da página 5 para verificar a escrita.");
     Serial.println("[NEGADO] Acesso negado.");
+    signalAccessDenied();
     Serial.println("====================================");
     delay(2000);
     return;
@@ -146,6 +160,7 @@ void loop(void) {
     Serial.println("[ALERTA] Escrita Bloqueada: dados lidos diferentes dos enviados para escrita.");
     Serial.println("[ALERTA] Possível bloqueio de escrita por lock bits ou negação de serviço (DoS).");
     Serial.println("[NEGADO] Integridade comprometida.");
+    signalAccessDenied();
     Serial.println("====================================");
     delay(2000);
     return;

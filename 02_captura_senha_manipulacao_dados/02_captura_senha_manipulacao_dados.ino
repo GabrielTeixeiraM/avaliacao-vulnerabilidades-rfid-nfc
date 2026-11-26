@@ -13,6 +13,15 @@ const uint8_t PASSWORD[4] = {0xA1, 0xB2, 0xC3, 0xD4};
 // PACK esperado, configurado na página 44 do NTAG213
 const uint8_t EXPECTED_PACK[2] = {0xA1, 0xB2};
 
+void signalAccessDenied(void) {
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(GREEN_LED, HIGH);
+    delay(100);
+    digitalWrite(GREEN_LED, LOW);
+    delay(100);
+  }
+}
+
 void setup(void) {
   Serial.begin(115200);
 
@@ -51,6 +60,7 @@ void loop(void) {
 
     if (uidLength != 7) {
       Serial.println("[NEGADO] UID incompatível com o critério de leitura NTAG213.");
+      signalAccessDenied();
       delay(1000);
       return;
     }
@@ -80,12 +90,14 @@ void loop(void) {
 
     if (!authenticated) {
       Serial.println("[NEGADO] Falha na comunicação ou autenticação.");
+      signalAccessDenied();
       delay(1000);
       return;
     }
 
     if (responseLength < 2) {
       Serial.println("[NEGADO] Resposta PWD_AUTH incompleta.");
+      signalAccessDenied();
       delay(1000);
       return;
     }
@@ -95,6 +107,7 @@ void loop(void) {
       Serial.println("[NEGADO] PACK diferente do esperado.");
       Serial.print("[INFO] PACK esperado: ");
       nfc.PrintHex(EXPECTED_PACK, 2);
+      signalAccessDenied();
       delay(1000);
       return;
     }
@@ -108,6 +121,7 @@ void loop(void) {
     if (!nfc.mifareultralight_ReadPage(4, pageData)) {
       Serial.println("[ERRO] Falha na leitura da página 4.");
       Serial.println("[NEGADO] Acesso negado.");
+      signalAccessDenied();
       delay(1000);
       return;
     }
@@ -128,6 +142,7 @@ void loop(void) {
     } else {
       Serial.println("[NEGADO] Dados da página 4 alterados.");
       Serial.println("[NEGADO] Acesso negado.");
+      signalAccessDenied();
     }
 
     delay(1000);

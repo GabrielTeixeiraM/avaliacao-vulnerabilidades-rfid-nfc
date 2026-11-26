@@ -7,6 +7,15 @@
 
 Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 
+void signalAccessDenied(void) {
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(GREEN_LED, HIGH);
+    delay(100);
+    digitalWrite(GREEN_LED, LOW);
+    delay(100);
+  }
+}
+
 void setup(void) {
   Serial.begin(115200);
   pinMode(GREEN_LED, OUTPUT);
@@ -65,12 +74,15 @@ void loop(void) {
           digitalWrite(GREEN_LED, LOW);
         } else {
           Serial.println("[NEGADO] Privilégio insuficiente (nível básico). Acesso negado.");
+          signalAccessDenied();
         }
       } else {
         Serial.println("[ERRO] Falha na leitura do bloco 4.");
+        signalAccessDenied();
       }
     } else {
       Serial.println("[ERRO] Falha na autenticação do setor 1.");
+      signalAccessDenied();
     }
 
     delay(2000);

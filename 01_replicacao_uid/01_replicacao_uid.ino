@@ -58,6 +58,12 @@ void loop(void) {
       digitalWrite(GREEN_LED, LOW);
     } else {
       Serial.println("[NEGADO] Credencial desconhecida. Acesso negado.");
+      for (int i = 0; i < 3; i++) {
+        digitalWrite(GREEN_LED, HIGH);
+        delay(100);
+        digitalWrite(GREEN_LED, LOW);
+        delay(100);
+      }
     }
 
     // Intervalo entre leituras do mesmo cartão
